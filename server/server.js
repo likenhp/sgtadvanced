@@ -5,7 +5,50 @@ const express = require("express");//load the express library into the file
 const server = express();
 
 server.use( express.static( __dirname + "/html" /* this is a path */) );
+//looking in the html forlder for a file called index.html
+//__dirname is your current working directory, in this case the server directory
+//the .static means nothing will change, the file it targets will not change until someone changes it (i.e. index.html)
 
+
+server.listen(3001, ()=>{
+    //console.log("server is runnning on port 3001");
+    console.log("carrier has arrived");
+    //the program will continue listening, it needs to be stopped by using "ctrl+c"
+})
+//you want the server to listen for a connection
+//where am I setting up
+//what function am I going to run after I know where I am (callback function)
+//it only does listening and nothing else right now
+
+server.get("/api/grades", (req, resp)=>{
+    resp.send(`{
+        "success": true,
+        "data": [{
+            "id": 7,
+            "name": "Joe Rossi",
+            "course": "Highlander",
+            "grade": 2
+        }, {
+            "id": 9,
+            "name": "Westley Poon",
+            "course": "Highloser",
+            "grade": 1
+        }, {
+            "id": 31,
+            "name": "David Lee",
+            "course": "Walrus",
+            "grade": 56
+        }]
+    }`)
+})
+//th /api means nothing, all the endpoints will be in a path of api to make it easy to locat a specific group
+
+
+
+
+
+
+/*
 const insults = [
     "your father smelt of elderberries",
     "I heard you took an arrow to the knee",
@@ -28,16 +71,4 @@ server.get("/time", (request, response)=>{
 server.get("/insult", (request,response)=>{
     response.send(insults[Math.floor(Math.random()*insults.length)]);
 })
-
-
-
-
-server.listen(3001, ()=>{
-    //console.log("server is runnning on port 3001");
-    console.log("carrier has arrived");
-    //the program will continue listening, it needs to be stopped by using "ctrl+c"
-})
-//you want the server to listen for a connection
-//where am I setting up
-//what function am I going to run after I know where I am (callback function)
-//it only does listening and nothing else right now
+*/

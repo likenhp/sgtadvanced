@@ -261,14 +261,15 @@ class SGT_template{
 		return console.log("These are all the server response errors", response.errors);
 	}
 
-	handleServerError(){
+	handleServerError(error){
+		console.log(error);
 		alert("Server Error!");
 	}
 
 	handleGetServerData(){
 		$.ajax({
-			url: "http://s-apis.learningfuze.com/sgt/get",
-			method: "post",
+			url: "api/grades",
+			method: "get",
 			data: {"api_key": "ZyP2nxIC1Q"},
 			dataType: "json",
 			success: this.getServerDataSuccess,	
