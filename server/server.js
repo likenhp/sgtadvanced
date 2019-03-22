@@ -113,6 +113,52 @@ server.post("/api/grades", (request, response)=>{
     })
 })
 
+server.delete("/api/grades", (req, resp)=>{
+    //console.log(req.query); <==remember, query is where all the data in the query is located
+    //resp.send(req.query); <==this closes the reception so it closes before end point and then it can't send the data down below
+    if(req.query.student_id === undefined){
+        resp.send({
+            "success": false,
+            "error": "must provied a valid student id for delete"
+        });
+        return;
+    }
+    db.connect(()=>{
+        const query = "DELETE FROM `grades` WHERE `id` = " +req.query.student_id;
+
+        db.query(query, (error, results)=>{
+            if(!error){
+                resp.send({
+                    "success": true
+                })
+            }else{
+                resp.send({
+                    "success": false,
+                    error
+                })
+            }
+        })
+    })
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 server.listen(3001, ()=>{

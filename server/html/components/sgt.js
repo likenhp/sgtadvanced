@@ -268,7 +268,7 @@ class SGT_template{
 
 	handleGetServerData(){
 		$.ajax({
-			url: "api/grades",
+			url: "/api/grades",
 			method: "get",
 			data: {"api_key": "ZyP2nxIC1Q"},
 			dataType: "json",
@@ -295,7 +295,7 @@ class SGT_template{
 
 	handleSendServerData(name, course, grade){
 		$.ajax({
-			url: "http://s-apis.learningfuze.com/sgt/create",
+			url: "/api/grades",
 			method: "post",
 			data: {
 				"api_key": "ZyP2nxIC1Q",
@@ -322,12 +322,8 @@ class SGT_template{
 
 	handleDeleteServerData(id){
 		$.ajax({
-			url: "http://s-apis.learningfuze.com/sgt/delete",
-			method: "post",
-			data: {
-				"api_key": "ZyP2nxIC1Q",
-				"student_id": id
-			},
+			url: "/api/grades?student_id=" +id, 
+			method: "delete",
 			dataType: "json",
 			success: this.deleteServerDataSuccess,
 			error: this.handleServerError
