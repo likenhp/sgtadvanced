@@ -1,18 +1,64 @@
 
 
 const express = require("express");//load the express library into the file
-const mysql = require("mysql");//load the mysql library into the file
-const mysqlcredentials = require("./mysqlcreds.js");//the ./ is necessary, since linux needs it to look into the current folder
+const mysql = require("mysql");//1st load the mysql library into the file
+const mysqlcredentials = require("./mysqlcreds.js");//2nd load, the ./ is necessary, since linux needs it to look into the current folder
 
-const db = mysql.createConnection(mysqlcredentials);//mysql connect to the database, use the creds to establish the connection
+const db = mysql.createConnection(mysqlcredentials);//3rd, mysql connect to the database, use the creds to establish the connection
 
 const server = express();
 
 server.use( express.static( __dirname + "/html" /* this is a path */) );
-//looking in the html forlder for a file called index.html
+//server.use is the in-between, the middleman
+//looking in the html folder for a file called index.html
 //__dirname is your current working directory, in this case the server directory
 //the .static means nothing will change, the file it targets will not change until someone changes it (i.e. index.html)
 
+server.use(express.urlencoded( {extended: false} ) );
+//hey express on any request coming in, go into the body
+//if you can find urlencoded data, pull it out and put it into an object for me
+//have express pull body data that is urlencoded and place it into an object called "body"
+
+//4th make an endpoint to handle retrieeving grades of all students
+server.get("/api/grades", (req, resp)=>{
+    //5th establish connection to the database and call the callback function when connection is made
+    db.connect( ()=>{
+        const queryGrades = 'SELECT `id`, CONCAT (`givenname`, " ", `surname`) AS `name`, `course`, `grade` FROM `grades`';
+        //6th create a query for our desired operation
+        db.query( queryGrades, (error, data )=>{
+            //7th send query to the database, and call the given callback function once the data is retrieved or an error happens
+            //8th if error is null no error occured
+            //9th create an output object to be sent back to the client
+            const output = {
+                "success": false,
+            }
+            //10th if error is null, send the data
+            if(!error){
+                //11th notify the client that we are sucessful
+                output.success = true;
+                output.data = data;
+                //12th//attach the data from the database to the output object
+            } else{
+                //13th an error occurred, attach that error 
+                output.error = error;
+            }
+
+            resp.send( output ); 
+            //14th send the data back to the client
+
+            //data will be auto detect whether it is a string or something else and convert to json
+        } )
+            //will pass in 3 params, error (will be null if no error)
+            //second is all of the data
+            //third one gives info of all the fields retrieved (we don't care about this)
+    }) 
+    //will instantiate a direct connect, takes a callback function once the connection is made
+})
+//the /api means nothing, all the endpoints will be in a path of api to make it easy to locat a specific group
+
+server.post("/api/grades", (req, resp)=>{
+
+})
 
 server.listen(3001, ()=>{
     //console.log("server is runnning on port 3001");
@@ -24,28 +70,26 @@ server.listen(3001, ()=>{
 //what function am I going to run after I know where I am (callback function)
 //it only does listening and nothing else right now
 
-server.get("/api/grades", (req, resp)=>{
-    resp.send(`{
-        "success": true,
-        "data": [{
-            "id": 7,
-            "name": "Joe Rossi",
-            "course": "Highlander",
-            "grade": 2
-        }, {
-            "id": 9,
-            "name": "Westley Poon",npm
-            "course": "Highloser",
-            "grade": 1
-        }, {
-            "id": 31,
-            "name": "David Lee",
-            "course": "Walrus",
-            "grade": 56
-        }]
-    }`)
-})
-//th /api means nothing, all the endpoints will be in a path of api to make it easy to locat a specific group
+//when the server receives a call from that url at that port, 
+//then call that function (db.connect)
+//connect iff that address is requested
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

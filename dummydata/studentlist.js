@@ -1,5 +1,5 @@
 
-
+//SELECT `id`, CONCAT (`givenname`, " ",`surname`) AS `name`, `course`, `grade` FROM `grades`
 
 var list = {
     success: true,
