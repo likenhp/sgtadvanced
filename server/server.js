@@ -1,6 +1,10 @@
 
 
 const express = require("express");//load the express library into the file
+const mysql = require("mysql");//load the mysql library into the file
+const mysqlcredentials = require("./mysqlcreds.js");//the ./ is necessary, since linux needs it to look into the current folder
+
+const db = mysql.createConnection(mysqlcredentials);//mysql connect to the database, use the creds to establish the connection
 
 const server = express();
 
@@ -30,7 +34,7 @@ server.get("/api/grades", (req, resp)=>{
             "grade": 2
         }, {
             "id": 9,
-            "name": "Westley Poon",
+            "name": "Westley Poon",npm
             "course": "Highloser",
             "grade": 1
         }, {
