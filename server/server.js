@@ -19,6 +19,8 @@ server.use(express.urlencoded( {extended: false} ) );
 //if you can find urlencoded data, pull it out and put it into an object for me
 //have express pull body data that is urlencoded and place it into an object called "body"
 
+
+
 //4th make an endpoint to handle retrieeving grades of all students
 server.get("/api/grades", (req, resp)=>{
     //5th establish connection to the database and call the callback function when connection is made
@@ -56,9 +58,62 @@ server.get("/api/grades", (req, resp)=>{
 })
 //the /api means nothing, all the endpoints will be in a path of api to make it easy to locat a specific group
 
-server.post("/api/grades", (req, resp)=>{
+//SELECT is for reading
+//INSERT is for adding
 
+//2 methods to insert
+//method1, can only insert 1 at a time = INSERT INTO `grades` SET `surname` = "Li", `givenname` = "Ken", `course` = "LF", `grade` = 80, `added` = NOW()
+//method2, can insert many = INSERT INTO `grades`(`surname`, `givenname`, `course`, `grade`) 
+    //VALUES ("Li", "Ken", "LF", 80), ("Yata", "Jason", "LF", 80)
+
+server.post("/api/grades", (request, response)=>{
+    // check the body object and see if any data was not sent
+    if(request.body.name === undefined || request.body.course === undefined || request.body.grade === undefined){
+        //respond to the client with an appropriate error message
+        response.send({
+            "success": false,
+            error: "invalid course, name, or grade"
+        });
+        //returns nothing to the server since the server is calling the function
+        //exits the functions and will not continue bbelow
+        return;
+    }
+
+    //connect to the database
+    db.connect(()=>{
+        //request is the client sending info to the server
+        //the body is the payload of the POST message
+        //then targetting the name and splitting the spaces in the string into array elements
+        const name = request.body.name.split(" ");
+        //making a MySQL query by concatinating a string
+        const query = 'INSERT INTO `grades` SET `surname` = "'+name.slice(1).join(" ")+'", `givenname` = "'+name[0]+'", `course` = "'+request.body.course+'", `grade` = '+request.body.grade+', `added` = NOW()';
+                                                                    //the .slice will make a copy of the name array from poision 1 to the end of the array
+        //console.log(query); this is node's console, so it is in the terminal (GitBash)
+        
+        //db.query is calling the query function
+        //the database will then execute the callback function when the database is reay
+        db.query(query, (error, results)=>{
+            if(!error){
+                //if no error client will get a success response
+                response.send({
+                    "success": true,
+                    "new_id": results.insertId
+                    //this targets the auto incrememnting field, can only have one auto incrementing field
+                    //in this case insertId would target the students id since it is the only object that auto increments
+                })
+            }else{
+                //if there is an error, the client will get an response
+                response.send({
+                    "success": false,
+                    error //works due to ES6 structuring
+                })
+            }
+        })
+        
+    })
 })
+
+
 
 server.listen(3001, ()=>{
     //console.log("server is runnning on port 3001");
