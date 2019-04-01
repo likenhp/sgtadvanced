@@ -4,10 +4,13 @@ const express = require("express");//load the express library into the file
 const mysql = require("mysql");//1st load the mysql library into the file
 const mysqlcredentials = require("./mysqlcreds.js");//2nd load, the ./ is necessary, since linux needs it to look into the current folder
 
+const cors = require("cors");//load the cors library into the file
+
 const db = mysql.createConnection(mysqlcredentials);//3rd, mysql connect to the database, use the creds to establish the connection
 
 const server = express();
 
+server.use(cors());
 server.use( express.static( __dirname + "/html" /* this is a path */) );
 //server.use is the in-between, the middleman
 //looking in the html folder for a file called index.html
@@ -18,6 +21,8 @@ server.use(express.urlencoded( {extended: false} ) );
 //hey express on any request coming in, go into the body
 //if you can find urlencoded data, pull it out and put it into an object for me
 //have express pull body data that is urlencoded and place it into an object called "body"
+
+server.use(express.json());//used for things like axios, VITAL
 
 
 
@@ -67,6 +72,7 @@ server.get("/api/grades", (req, resp)=>{
     //VALUES ("Li", "Ken", "LF", 80), ("Yata", "Jason", "LF", 80)
 
 server.post("/api/grades", (request, response)=>{
+    console.log(request.body);
     // check the body object and see if any data was not sent
     if(request.body.name === undefined || request.body.course === undefined || request.body.grade === undefined){
         //respond to the client with an appropriate error message
@@ -113,10 +119,10 @@ server.post("/api/grades", (request, response)=>{
     })
 })
 
-server.delete("/api/grades", (req, resp)=>{
+server.delete("/api/grades/:student_id", (req, resp)=>{
     //console.log(req.query); <==remember, query is where all the data in the query is located
     //resp.send(req.query); <==this closes the reception so it closes before end point and then it can't send the data down below
-    if(req.query.student_id === undefined){
+    if(req.params.student_id === undefined){
         resp.send({
             "success": false,
             "error": "must provied a valid student id for delete"
@@ -124,7 +130,7 @@ server.delete("/api/grades", (req, resp)=>{
         return;
     }
     db.connect(()=>{
-        const query = "DELETE FROM `grades` WHERE `id` = " +req.query.student_id;
+        const query = "DELETE FROM `grades` WHERE `id` = " +req.params.student_id;
 
         db.query(query, (error, results)=>{
             if(!error){
